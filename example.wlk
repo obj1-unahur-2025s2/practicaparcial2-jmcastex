@@ -1,63 +1,104 @@
 class Personaje{
-
-  var fuerza 
+  
+  var fuerza
   var inteligencia
   var rol
-  var esHumano
 
-
-  method cambiarRol(nuevoRol) {
-    rol=nuevoRol
-  }
-
-  method esinteligente()= if(!esHumano)false else inteligencia>50
+  method cambiarRol(nuevoRol) {rol=nuevoRol}
+  method potencialOfensivo() = fuerza*10 + rol.danoExtra() +self.brutalidadInnata()
+  method esGroso() =self.esInteligente() or self.esGrosoEnSuRol() 
+  method brutalidadInnata() 
+  method esInteligente() 
   method esGrosoEnSuRol()   
 
-  method potencialOfensivo() =fuerza*10 
-  method esGroso() = self.esinteligente() or self.esGrosoEnSuRol()
+}
 
+class Orco inherits Personaje{
+
+  override method brutalidadInnata() =(fuerza*10 + rol.danoExtra())*0.1
+  override method esInteligente()=false
+  override method esGrosoEnSuRol()=rol.esGrosoElPersonaje(self)
 
 }
 
-class Guerrero inherits Personaje {
-  
-  override method potencialOfensivo() =super() + 100
-  override method esGrosoEnSuRol()= fuerza>50
-}
+class Humano inherits Personaje{
 
-
-class Cazador inherits Personaje {
-  
-  var mascota
-
-  override method potencialOfensivo() = super() + mascota.potencialOfensivo() 
-  override method esGrosoEnSuRol()= mascota.edad()>10
-
+  override method brutalidadInnata()=0
+  override method esInteligente()=inteligencia>50
+  override method esGrosoEnSuRol()=rol.esGrosoElPersonaje(self)
 
 }
-
-class Orcos  inherits Personaje{
-
-  override method potencialOfensivo() = super() + (super()*0.10 )
-  override method esGrosoEnSuRol()= true
-  
-}
-
-
-class Brujo inherits Personaje {
-
-  override method esGrosoEnSuRol()= true
-  
-}
-
 
 class Mascota {
   
   var fuerza
   var edad
-  var garras
+  var tieneGarras
 
-  method potencialOfensivo() = if(garras) fuerza*2 else fuerza
+  method potencialOfensivo() =if(tieneGarras)fuerza*2 else fuerza
 
+
+}
+
+
+//-------------roles--------------------
+
+object guerrero {
+
+  method danoExtra() =100 
+  method esGrosoElPersonaje(unPersonaje)=unPersonaje.fuerza()>50
+  
+}
+
+
+class Cazador {
+
+  var property mascota
+
+  method domarNuevaMascota(fuerza,edad,tieneGarras) {
+    const nuevaMascota=new Mascota(fuerza=fuerza,edad=edad,tieneGarras=tieneGarras)
+  }
+
+  method danoExtra() =mascota.potencialOfensivo() 
+  method esGrosoElPersonaje(unPersonaje)=unPersonaje.mascota().edad()>10
+  
+}
+
+object brujo {
+
+  method danoExtra() =0 
+  method esGrosoElPersonaje(unPersonaje)=true
+  
+}
+
+//------------------localidades----------------------
+
+class Localidad{
+  
+  var cantMaximaDeHabitantes
+  const ejercito=[]
+
+}
+
+class Ciudad inherits Localidad{
+
+}
+
+class Aldea inherits Localidad{
+
+
+}
+
+//--------------------ejercito-------------------
+
+
+class Ejercito{
+
+  const personajes=#{}
+
+  method AgregarPersonaje(unPersonaje) {personajes.add(unPersonaje)}
+  method quitarPersonaje(unPersonaje) {personajes.remove(unPersonaje)}
+
+  method potencialOfensivo() =personajes.sum({p=>p.potencialOfensivo()}) 
 
 }
